@@ -31,8 +31,11 @@ RUN mvn install:install-file \
     -DlocalRepositoryPath=/root/.m2/repository \
     -DcreateChecksum=true
 
+# Debug: Check if JAR was installed correctly
+RUN ls -la /root/.m2/repository/com/example/payment/0.0.1-SNAPSHOT/
+
 # Build the application with debug logging
-RUN mvn clean package -DskipTests -X
+RUN mvn clean package -DskipTests -X -e
 
 # Run stage
 FROM openjdk:17-jdk-slim

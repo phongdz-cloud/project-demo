@@ -32,6 +32,8 @@
             <groupId>com.example</groupId>
             <artifactId>payment</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/payment-0.0.1-SNAPSHOT.jar</systemPath>
         </dependency>
     </dependencies>
 
@@ -42,6 +44,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <includeSystemScope>true</includeSystemScope>
+                    <mainClass>com.example.project.ProjectApplication</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -53,7 +56,6 @@
                     <target>${java.version}</target>
                     <verbose>true</verbose>
                     <fork>true</fork>
-                    <compilerArgument>-verbose</compilerArgument>
                 </configuration>
             </plugin>
         </plugins>
