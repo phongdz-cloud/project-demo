@@ -9,6 +9,12 @@ COPY libs/payment-*.jar /build/libs/
 COPY pom.xml .
 COPY src ./src
 
+# Debug: List contents of libs directory
+RUN ls -la libs/
+
+# Debug: Check JAR file contents
+RUN jar tf libs/payment-0.0.1-SNAPSHOT.jar
+
 # Create Maven local repository directory and install payment JAR
 RUN mkdir -p /root/.m2/repository && \
     mvn install:install-file \
@@ -21,8 +27,11 @@ RUN mkdir -p /root/.m2/repository && \
     -DlocalRepositoryPath=/root/.m2/repository \
     -DcreateChecksum=true
 
-# Build the application
-RUN mvn clean package -DskipTests
+# Debug: Check if JAR was installed correctly
+RUN ls -la /root/.m2/repository/com/example/payment/0.0.1-SNAPSHOT/
+
+# Build the application with debug logging
+RUN mvn clean package -DskipTests -X -e
 
 # Run stage
 FROM openjdk:17-jdk-slim
@@ -40,5 +49,5 @@ EXPOSE 8080
 # Set JVM options for better performance
 ENV JAVA_OPTS="-Xms512m -Xmx512m -XX:+UseG1GC"
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run the application with JVM options
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
