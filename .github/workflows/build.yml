@@ -35,7 +35,7 @@ jobs:
           path: libs
           github-token: ${{ secrets.GITHUB_TOKEN }}
           repository: phongdz-cloud/payment-demo
-          run-id: ${{ github.event.inputs.payment_run_id }}
+          run-id: ${{ steps.get-run.outputs.result }}
 
       - name: Install Payment JAR to local Maven repository
         run: |
