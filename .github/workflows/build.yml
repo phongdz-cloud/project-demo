@@ -3,7 +3,7 @@ name: Build Project Service
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -12,14 +12,30 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Get latest payment workflow run
+        id: get-run
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const runs = await github.rest.actions.listWorkflowRuns({
+              owner: 'phongdz-cloud',
+              repo: 'payment-demo',
+              workflow_id: 'build.yml',
+              status: 'completed',
+              conclusion: 'success',
+              per_page: 1
+            });
+            return runs.data.workflow_runs[0].id;
+
       - name: Download Payment JAR
         uses: actions/download-artifact@v4
         with:
           name: payment-jar
           path: libs
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          repository: phongdz-cloud/payment-demo # Thay đổi thành repository của payment service
-          run-id: ${{ github.event.inputs.run_id }} # ID của workflow run của payment service
+          repository: phongdz-cloud/payment-demo
+          run-id: ${{ steps.get-run.outputs.result }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
