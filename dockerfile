@@ -4,24 +4,14 @@ FROM maven:3.8.4-openjdk-17 AS builder
 # Set working directory
 WORKDIR /build
 
-# Copy payment JAR
+# Copy payment JAR and project files
 COPY libs/payment-*.jar /build/libs/
-
-# Debug: List contents of libs directory
-RUN ls -la libs/
-
-# Debug: Check JAR file contents
-RUN jar tf libs/payment-0.0.1-SNAPSHOT.jar
-
-# Copy pom.xml and source code
 COPY pom.xml .
 COPY src ./src
 
-# Create Maven local repository directory
-RUN mkdir -p /root/.m2/repository
-
-# Install payment JAR to local Maven repository
-RUN mvn install:install-file \
+# Create Maven local repository directory and install payment JAR
+RUN mkdir -p /root/.m2/repository && \
+    mvn install:install-file \
     -Dfile=libs/payment-0.0.1-SNAPSHOT.jar \
     -DgroupId=com.example \
     -DartifactId=payment \
@@ -31,18 +21,8 @@ RUN mvn install:install-file \
     -DlocalRepositoryPath=/root/.m2/repository \
     -DcreateChecksum=true
 
-# Debug: Check if JAR was installed correctly
-RUN ls -la /root/.m2/repository/com/example/payment/0.0.1-SNAPSHOT/
-
-# Debug: Check Maven settings
-RUN cat /root/.m2/settings.xml || echo "No settings.xml found"
-
-# Debug: Check project structure
-RUN ls -la /build
-RUN ls -la /build/src/main/java/com/example/project/
-
-# Build the application with debug logging
-RUN mvn clean package -DskipTests -X -e -Dmaven.test.skip=true -Dmaven.compiler.failOnError=false
+# Build the application
+RUN mvn clean package -DskipTests
 
 # Run stage
 FROM openjdk:17-jdk-slim
@@ -50,14 +30,15 @@ FROM openjdk:17-jdk-slim
 # Set working directory
 WORKDIR /app
 
-# Copy payment JAR from builder
+# Copy payment JAR and built application
 COPY --from=builder /build/libs/payment-*.jar /app/libs/
-
-# Copy built JAR from builder
 COPY --from=builder /build/target/*.jar app.jar
 
 # Expose port
 EXPOSE 8080
+
+# Set JVM options for better performance
+ENV JAVA_OPTS="-Xms512m -Xmx512m -XX:+UseG1GC"
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
