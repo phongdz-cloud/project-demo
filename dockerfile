@@ -7,6 +7,12 @@ WORKDIR /build
 # Copy payment JAR
 COPY libs/payment-*.jar /build/libs/
 
+# Debug: List contents of libs directory
+RUN ls -la libs/
+
+# Debug: Check JAR file contents
+RUN jar tf libs/payment-0.0.1-SNAPSHOT.jar
+
 # Copy pom.xml and source code
 COPY pom.xml .
 COPY src ./src
@@ -21,7 +27,11 @@ RUN mvn install:install-file \
     -DartifactId=payment \
     -Dversion=0.0.1-SNAPSHOT \
     -Dpackaging=jar \
-    -DgeneratePom=true
+    -DgeneratePom=true \
+    -DlocalRepositoryPath=/root/.m2/repository
+
+# Debug: Check if JAR was installed correctly
+RUN ls -la /root/.m2/repository/com/example/payment/0.0.1-SNAPSHOT/
 
 # Build the application with debug logging
 RUN mvn clean package -DskipTests -X
