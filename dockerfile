@@ -20,8 +20,7 @@ RUN mvn install:install-file \
     -DgroupId=com.example \
     -DartifactId=payment \
     -Dversion=0.0.1-SNAPSHOT \
-    -Dpackaging=jar \
-    -DlocalRepositoryPath=/root/.m2/repository
+    -Dpackaging=jar
 
 # Build the application
 RUN mvn clean package -DskipTests
