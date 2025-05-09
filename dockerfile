@@ -20,6 +20,11 @@ COPY src ./src
 # Create Maven local repository directory
 RUN mkdir -p /root/.m2/repository
 
+# Extract payment JAR to get the classes
+RUN mkdir -p /build/payment-classes && \
+    cd /build/payment-classes && \
+    jar xf /build/libs/payment-0.0.1-SNAPSHOT.jar
+
 # Install payment JAR to local Maven repository
 RUN mvn install:install-file \
     -Dfile=libs/payment-0.0.1-SNAPSHOT.jar \
@@ -29,9 +34,6 @@ RUN mvn install:install-file \
     -Dpackaging=jar \
     -DgeneratePom=true \
     -DlocalRepositoryPath=/root/.m2/repository
-
-# Debug: Check if JAR was installed correctly
-RUN ls -la /root/.m2/repository/com/example/payment/0.0.1-SNAPSHOT/
 
 # Build the application with debug logging
 RUN mvn clean package -DskipTests -X
