@@ -47,6 +47,12 @@
                 <configuration>
                     <includeSystemScope>true</includeSystemScope>
                     <mainClass>com.example.project.ProjectApplication</mainClass>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
