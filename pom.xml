@@ -6,7 +6,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.2.3</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
     <groupId>com.example</groupId>
     <artifactId>project</artifactId>
@@ -32,6 +32,8 @@
             <groupId>com.example</groupId>
             <artifactId>payment</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/payment-0.0.1-SNAPSHOT.jar</systemPath>
         </dependency>
     </dependencies>
 

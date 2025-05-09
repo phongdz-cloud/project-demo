@@ -20,10 +20,11 @@ RUN mvn install:install-file \
     -DgroupId=com.example \
     -DartifactId=payment \
     -Dversion=0.0.1-SNAPSHOT \
-    -Dpackaging=jar
+    -Dpackaging=jar \
+    -DgeneratePom=true
 
-# Build the application
-RUN mvn clean package -DskipTests
+# Build the application with debug logging
+RUN mvn clean package -DskipTests -X
 
 # Run stage
 FROM openjdk:17-jdk-slim
