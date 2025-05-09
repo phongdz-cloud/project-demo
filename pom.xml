@@ -47,12 +47,6 @@
                 <configuration>
                     <includeSystemScope>true</includeSystemScope>
                     <mainClass>com.example.project.ProjectApplication</mainClass>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
@@ -64,10 +58,6 @@
                     <target>${java.version}</target>
                     <verbose>true</verbose>
                     <fork>true</fork>
-                    <compilerArgs>
-                        <arg>-verbose</arg>
-                        <arg>-Xlint:all</arg>
-                    </compilerArgs>
                 </configuration>
             </plugin>
         </plugins>

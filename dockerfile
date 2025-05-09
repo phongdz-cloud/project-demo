@@ -9,15 +9,11 @@ COPY libs/payment-*.jar /build/libs/
 COPY pom.xml .
 COPY src ./src
 
-# Debug: List contents of libs directory
-RUN ls -la libs/
+# Create Maven local repository directory
+RUN mkdir -p /root/.m2/repository
 
-# Debug: Check JAR file contents
-RUN jar tf libs/payment-0.0.1-SNAPSHOT.jar
-
-# Create Maven local repository directory and install payment JAR
-RUN mkdir -p /root/.m2/repository && \
-    mvn install:install-file \
+# Install payment JAR with specific parameters
+RUN mvn install:install-file \
     -Dfile=libs/payment-0.0.1-SNAPSHOT.jar \
     -DgroupId=com.example \
     -DartifactId=payment \
@@ -25,20 +21,11 @@ RUN mkdir -p /root/.m2/repository && \
     -Dpackaging=jar \
     -DgeneratePom=true \
     -DlocalRepositoryPath=/root/.m2/repository \
-    -DcreateChecksum=true
+    -DcreateChecksum=true \
+    -Dclassifier=sources
 
-# Debug: Check if JAR was installed correctly
-RUN ls -la /root/.m2/repository/com/example/payment/0.0.1-SNAPSHOT/
-
-# Debug: Check Maven settings
-RUN cat /root/.m2/settings.xml || echo "No settings.xml found"
-
-# Debug: Check project structure
-RUN ls -la /build
-RUN ls -la /build/src/main/java/com/example/project/
-
-# Build the application with debug logging
-RUN mvn clean package -DskipTests -X -e -Dmaven.test.skip=true -Dmaven.compiler.failOnError=false
+# Build the application
+RUN mvn clean package -DskipTests -Dmaven.test.skip=true
 
 # Run stage
 FROM openjdk:17-jdk-slim
