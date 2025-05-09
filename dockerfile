@@ -28,7 +28,8 @@ RUN mvn install:install-file \
     -Dversion=0.0.1-SNAPSHOT \
     -Dpackaging=jar \
     -DgeneratePom=true \
-    -DlocalRepositoryPath=/root/.m2/repository
+    -DlocalRepositoryPath=/root/.m2/repository \
+    -DcreateChecksum=true
 
 # Build the application with debug logging
 RUN mvn clean package -DskipTests -X
