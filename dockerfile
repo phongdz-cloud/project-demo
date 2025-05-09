@@ -1,4 +1,3 @@
-# project/Dockerfile
 # Build stage
 FROM maven:3.8.4-openjdk-17 AS builder
 
@@ -11,6 +10,18 @@ COPY libs/payment-*.jar /build/libs/
 # Copy pom.xml and source code
 COPY pom.xml .
 COPY src ./src
+
+# Create Maven local repository directory
+RUN mkdir -p /root/.m2/repository
+
+# Install payment JAR to local Maven repository
+RUN mvn install:install-file \
+    -Dfile=libs/payment-0.0.1-SNAPSHOT.jar \
+    -DgroupId=com.example \
+    -DartifactId=payment \
+    -Dversion=0.0.1-SNAPSHOT \
+    -Dpackaging=jar \
+    -DlocalRepositoryPath=/root/.m2/repository
 
 # Build the application
 RUN mvn clean package -DskipTests
