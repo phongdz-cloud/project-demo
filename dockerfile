@@ -35,7 +35,7 @@ RUN mvn clean package \
     -Dmaven.compiler.threads=4
 
 # Run stage
-FROM eclipse-temurin:17-jre-alpine
+FROM openjdk:17-slim
 
 # Set working directory
 WORKDIR /app
