@@ -1,11 +1,14 @@
 # Build stage
-FROM maven:3.8.4-openjdk-17 AS builder
+FROM maven:3.8.4-openjdk-17-slim AS builder
 
 # Set working directory
 WORKDIR /build
 
-# Copy project files and payment JAR
+# Copy only pom.xml first to cache dependencies
 COPY pom.xml .
+RUN mvn dependency:go-offline
+
+# Copy project files and payment JAR
 COPY src ./src
 COPY libs/payment-0.0.1-SNAPSHOT.jar /build/libs/
 
@@ -22,11 +25,15 @@ RUN mvn install:install-file \
     -DgeneratePom=true \
     -DlocalRepositoryPath=/root/.m2/repository
 
-# Build the application
-RUN mvn clean package -DskipTests -Dmaven.test.skip=true
+# Build the application with optimized settings
+RUN mvn clean package \
+    -DskipTests \
+    -Dmaven.test.skip=true \
+    -Dmaven.compiler.fork=true \
+    -Dmaven.compiler.threads=4
 
 # Run stage
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jre-alpine
 
 # Set working directory
 WORKDIR /app
@@ -38,7 +45,7 @@ COPY --from=builder /build/target/*.jar app.jar
 EXPOSE 8080
 
 # Set JVM options for better performance
-ENV JAVA_OPTS="-Xms512m -Xmx512m -XX:+UseG1GC"
+ENV JAVA_OPTS="-Xms512m -Xmx512m -XX:+UseG1GC -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
 
 # Run the application with JVM options
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
