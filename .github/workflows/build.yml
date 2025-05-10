@@ -14,20 +14,31 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Get current branch
+        id: branch
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
+
       - name: Get latest payment workflow run
         id: get-run
         uses: actions/github-script@v6
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const currentBranch = '${{ steps.branch.outputs.branch }}';
             const runs = await github.rest.actions.listWorkflowRuns({
               owner: 'phongdz-cloud',
               repo: 'payment-demo',
               workflow_id: 'build.yml',
               status: 'completed',
               conclusion: 'success',
+              branch: currentBranch,  // Lọc theo branch hiện tại
               per_page: 1
             });
+
+            if (!runs.data.workflow_runs.length) {
+              throw new Error(`No successful workflow runs found for branch ${currentBranch}`);
+            }
+
             return runs.data.workflow_runs[0].id;
 
       - name: Download Payment JAR
@@ -55,4 +66,4 @@ jobs:
           tags: project:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          load: true # Thêm option này để load image vào Docker local
+          load: true
