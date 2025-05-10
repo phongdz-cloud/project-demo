@@ -55,3 +55,4 @@ jobs:
           tags: project:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          load: true # Thêm option này để load image vào Docker local

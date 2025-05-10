@@ -4,12 +4,8 @@ FROM maven:3.8.4-openjdk-17-slim AS builder
 # Set working directory
 WORKDIR /build
 
-# Copy only pom.xml first to cache dependencies
-COPY pom.xml .
-RUN mvn dependency:go-offline
-
 # Copy project files and payment JAR
-COPY src ./src
+COPY pom.xml .
 COPY libs/payment-0.0.1-SNAPSHOT.jar /build/libs/
 
 # Create Maven local repository directory
@@ -24,6 +20,12 @@ RUN mvn install:install-file \
     -Dpackaging=jar \
     -DgeneratePom=true \
     -DlocalRepositoryPath=/root/.m2/repository
+
+# Now we can safely run dependency:go-offline
+RUN mvn dependency:go-offline
+
+# Copy source code
+COPY src ./src
 
 # Build the application with optimized settings
 RUN mvn clean package \
