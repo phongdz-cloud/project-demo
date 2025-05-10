@@ -1,4 +1,3 @@
-# project/.github/workflows/build.yml
 name: Build Project Service
 
 on:
@@ -38,4 +37,8 @@ jobs:
           run-id: ${{ steps.get-run.outputs.result }}
 
       - name: Build Docker image
-        run: docker build -t project:latest .
+        run: |
+          # Create libs directory if it doesn't exist
+          mkdir -p libs
+          # Build Docker image
+          docker build -t project:latest .
