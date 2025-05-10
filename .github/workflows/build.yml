@@ -36,9 +36,13 @@ jobs:
           repository: phongdz-cloud/payment-demo
           run-id: ${{ steps.get-run.outputs.result }}
 
-      - name: Build Docker image
+      - name: Verify JAR file
         run: |
-          # Create libs directory if it doesn't exist
-          mkdir -p libs
-          # Build Docker image
-          docker build -t project:latest .
+          ls -la libs/
+          if [ ! -f "libs/payment-0.0.1-SNAPSHOT.jar" ]; then
+            echo "JAR file not found!"
+            exit 1
+          fi
+
+      - name: Build Docker image
+        run: docker build -t project:latest .

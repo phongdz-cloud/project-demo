@@ -4,9 +4,10 @@ FROM maven:3.8.4-openjdk-17 AS builder
 # Set working directory
 WORKDIR /build
 
-# Copy project files
+# Copy project files and payment JAR
 COPY pom.xml .
 COPY src ./src
+COPY libs/payment-0.0.1-SNAPSHOT.jar /build/libs/
 
 # Create Maven local repository directory
 RUN mkdir -p /root/.m2/repository
